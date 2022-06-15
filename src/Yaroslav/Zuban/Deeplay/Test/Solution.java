@@ -1,11 +1,15 @@
 package Yaroslav.Zuban.Deeplay.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
 public class Solution {
+    private FileHandling fileHandling;
+
+    private List<String> nameCreatures = new ArrayList<>();
+    private List<String> nameObstacles = new ArrayList<>();
+    private List<Integer> movingCost = new ArrayList<>();
+
     private String fieldDescription;
     private String creature;
     private static int result = 0;
@@ -16,12 +20,15 @@ public class Solution {
     private Character[][] matrix;
     private Integer[][] matrixNumber;
 
-    public Solution(String fieldDescription, String creature) throws Exception {
+    public Solution(String fieldDescription, String creature,File file) throws Exception {
         if (fieldDescription.length() != 16) {
             throw new Exception("Error");
         }
 
-        if (creature.compareTo("Human") != 0 && creature.compareTo("Woodman") != 0 && creature.compareTo("Swamper") != 0) {
+        fileHandling = new ReadingFile(file);
+        fileHandling.workingFile(nameCreatures, nameObstacles, movingCost);
+
+        if (!nameCreatures.contains(creature)) {
             throw new Exception("Error");
         }
 
@@ -71,24 +78,19 @@ public class Solution {
     private void creatureDefinition() {
         characteristics = new HashMap<>();
 
-        if (this.creature.compareTo("Human") == 0) {
-            characteristics.put("S", 5);
-            characteristics.put("W", 2);
-            characteristics.put("T", 3);
-            characteristics.put("P", 1);
-        } else if (this.creature.compareTo("Swamper") == 0) {
-            characteristics.put("S", 2);
-            characteristics.put("W", 2);
-            characteristics.put("T", 5);
-            characteristics.put("P", 2);
-        } else if (this.creature.compareTo("Woodman") == 0) {
-            characteristics.put("S", 3);
-            characteristics.put("W", 3);
-            characteristics.put("T", 2);
-            characteristics.put("P", 2);
-        }
-    }
+        int index = nameCreatures.indexOf(creature);
 
+        int start = index * nameObstacles.size();
+        int finish = start + nameObstacles.size();
+
+        for (int j = start, i = 0; j < finish && i < nameObstacles.size(); j++, i++) {
+            String temp=String.valueOf(nameObstacles.get(i).toUpperCase(Locale.ROOT).charAt(0));
+            Integer number=movingCost.get(j);
+
+            characteristics.put(temp,number);
+        }
+
+    }
 
     private void addVertices(List<Edge> array, int line, int column, int length, int point) {
         if (line - 1 >= 0 && point - 4 >= 0) {
